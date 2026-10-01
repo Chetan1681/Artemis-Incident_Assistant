@@ -5,6 +5,7 @@ import { MongoClient } from "mongodb";
 
 import employeeRoutes from "./API Routes/employees.js";
 import incidentRoutes from "./API Routes/incidents.js";
+import applicationRoutes from "./API Routes/applicationRoutes.js";
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ async function connectDB() {
 
     collections.employees = db.collection("Employees");
     collections.incidents = db.collection("Incidents");
+    collections.applications = db.collection("Applications");
 
     console.log("Connected to MongoDB Atlas successfully");
   } catch (err) {
@@ -36,6 +38,7 @@ await connectDB();
 
 app.use("/employees", employeeRoutes(collections));
 app.use("/incidents", incidentRoutes(collections));
+app.use("/applications", applicationRoutes(collections));
 
 app.get("/", (req, res) => {
   res.json({
