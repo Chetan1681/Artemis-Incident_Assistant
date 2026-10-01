@@ -37,5 +37,28 @@ export default function incidentRoutes(collections) {
     }
   });
 
+  // Get Incidents By Employee ID
+  router.get("/employee/:employeeId", async (req, res) => {
+    try {
+      const incidents = await collections.incidents
+        .find({
+          employee_id: req.params.employeeId,
+        })
+        .toArray();
+
+      if (incidents.length === 0) {
+        return res.status(404).json({
+          message: "No incidents found for this employee",
+        });
+      }
+
+      res.json(incidents);
+    } catch (err) {
+      res.status(500).json({
+        error: err.message,
+      });
+    }
+  });
+
   return router;
 }
