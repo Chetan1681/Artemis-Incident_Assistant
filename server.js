@@ -1,18 +1,21 @@
 import dotenv from "dotenv";
-import express, { json } from "express";
+import express from "express";
 import cors from "cors";
 import { MongoClient } from "mongodb";
+
+import employeeRoutes from "./API Routes/employees.js";
+import incidentRoutes from "./API Routes/incidents.js";
 
 dotenv.config();
 
 const app = express();
 
 app.use(cors());
-app.use(json());
+app.use(express.json());
 
 const client = new MongoClient(process.env.MONGO_URI);
 
-let employeeCollection;
+const collections = {};
 
 async function connectDB() {
   try {
@@ -20,7 +23,8 @@ async function connectDB() {
 
     const db = client.db(process.env.DB_NAME);
 
-    employeeCollection = db.collection(process.env.COLLECTION_NAME);
+    collections.employees = db.collection("Employees");
+    collections.incidents = db.collection("Incidents");
 
     console.log("Connected to MongoDB Atlas successfully");
   } catch (err) {
@@ -28,28 +32,18 @@ async function connectDB() {
   }
 }
 
-connectDB();
+await connectDB();
+
+app.use("/employees", employeeRoutes(collections));
+app.use("/incidents", incidentRoutes(collections));
 
 app.get("/", (req, res) => {
   res.json({
     status: "success",
-    message: "Employee API running",
+    message: "API running",
   });
 });
 
-app.get("/employees", async (req, res) => {
-  const employees = await employeeCollection.find({}).toArray();
-  res.json(employees);
-});
-
-app.get("/employees/:employeeId", async (req, res) => {
-  const employee = await employeeCollection.findOne({
-    employee_id: req.params.employeeId,
-  });
-
-  res.json(employee);
-});
-
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
+app.listen(process.env.PORT, () => {
+  console.log(`Server running on port ${process.env.PORT}`);
 });
