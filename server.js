@@ -3,9 +3,10 @@ import express from "express";
 import cors from "cors";
 import { MongoClient } from "mongodb";
 
-import employeeRoutes from "./API Routes/employees.js";
-import incidentRoutes from "./API Routes/incidents.js";
+import employeeRoutes from "./API Routes/employeeRoutes.js";
+import incidentRoutes from "./API Routes/incidentRoutes.js";
 import applicationRoutes from "./API Routes/applicationRoutes.js";
+import networkServiceRoutes from "./API Routes/networkServiceRoutes.js";
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ async function connectDB() {
     collections.employees = db.collection("Employees");
     collections.incidents = db.collection("Incidents");
     collections.applications = db.collection("Applications");
+    collections.networkServices = db.collection("NetworkServices");
 
     console.log("Connected to MongoDB Atlas successfully");
   } catch (err) {
@@ -39,6 +41,7 @@ await connectDB();
 app.use("/employees", employeeRoutes(collections));
 app.use("/incidents", incidentRoutes(collections));
 app.use("/applications", applicationRoutes(collections));
+app.use("/networkServices", networkServiceRoutes(collections));
 
 app.get("/", (req, res) => {
   res.json({
